@@ -1,0 +1,13 @@
+[package]
+name = "bbl-usd"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+glam = {version = "0.24.2", features = ["scalar-math"]}
+
+[build-dependencies]
+# bbl-build = {git = "https://github.com/anderslanglands/bbl-build-rs.git"}
+bbl-build = {path = "../bbl-build-rs"}
