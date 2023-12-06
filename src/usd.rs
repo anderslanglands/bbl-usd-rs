@@ -9,6 +9,7 @@ use std::path::Path;
 #[derive(Debug)]
 pub enum Error {
     StageOpen { filename: String },
+    NoPrimAtPath { path: String },
 }
 
 pub struct Stage {}
@@ -47,8 +48,23 @@ impl StageRefPtr {
         unsafe {
             let mut ptr = std::ptr::null_mut();
             ffi::usd_StageRefPtr_GetPseudoRoot(self.ptr, &mut ptr);
-
             Prim { ptr }
+        }
+    }
+
+    pub fn prim_at_path<P: Into<sdf::Path>>(&self, path: P) -> Result<Prim, Error> {
+        let path = path.into();
+        unsafe {
+            let mut ptr = std::ptr::null_mut();
+            ffi::usd_StageRefPtr_GetPrimAtPath(self.ptr, path.ptr, &mut ptr);
+            let mut valid = false;
+            ffi::usd_Prim_IsValid(ptr, &mut valid);
+
+            if valid {
+                Ok(Prim{ptr})
+            } else {
+                Err(Error::NoPrimAtPath { path: path.text().to_string() })
+            }
         }
     }
 }
@@ -357,7 +373,6 @@ pub trait PropertyEx {
             result
         }
     }
-
 }
 
 pub struct Property {
@@ -478,6 +493,16 @@ impl<'a> Iterator for PropertyVectorIterator<'a> {
     }
 }
 
+impl<'a> IntoIterator for &'a PropertyVector {
+    type Item = PropertyRef;
+    type IntoIter = PropertyVectorIterator<'a>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
+
 pub struct Attribute {
     ptr: *mut ffi::usd_Attribute_t,
 }
@@ -490,7 +515,7 @@ impl Attribute {
             let mut result = false;
             ffi::usd_Attribute_Get(self.ptr, ptr, TimeCode::default().0, &mut result);
             if result {
-                Some(vt::Value{ptr})
+                Some(vt::Value { ptr })
             } else {
                 None
             }
@@ -504,7 +529,7 @@ impl Attribute {
             let mut result = false;
             ffi::usd_Attribute_Get(self.ptr, ptr, time.0, &mut result);
             if result {
-                Some(vt::Value{ptr})
+                Some(vt::Value { ptr })
             } else {
                 None
             }
@@ -515,7 +540,7 @@ impl Attribute {
         unsafe {
             let mut ptr = std::ptr::null_mut();
             ffi::usd_Attribute_GetTypeName(self.ptr, &mut ptr);
-            sdf::ValueTypeName{ptr}
+            sdf::ValueTypeName { ptr }
         }
     }
 }
@@ -630,7 +655,7 @@ pub struct TimeCode(ffi::usd_TimeCode_t);
 impl Default for TimeCode {
     fn default() -> Self {
         unsafe {
-            let mut tc = ffi::usd_TimeCode_t{time: 0.0};
+            let mut tc = ffi::usd_TimeCode_t { time: 0.0 };
             ffi::usd_TimeCode_Default(&mut tc);
             TimeCode(tc)
         }
