@@ -8,7 +8,7 @@ pub struct AssetPath {
 impl AssetPath {
     pub fn asset_path(&self) -> &str {
         unsafe {
-            let mut ptr = std::ptr::null_mut();
+            let mut ptr = std::ptr::null();
             ffi::sdf_AssetPath_GetAssetPath(self.ptr, &mut ptr);
             let cstr = CStr::from_ptr(ptr).to_str().unwrap();
             cstr
@@ -17,7 +17,7 @@ impl AssetPath {
 
     pub fn resolved_path(&self) -> &str {
         unsafe {
-            let mut ptr = std::ptr::null_mut();
+            let mut ptr = std::ptr::null();
             ffi::sdf_AssetPath_GetResolvedPath(self.ptr, &mut ptr);
             let cstr = CStr::from_ptr(ptr).to_str().unwrap();
             cstr
@@ -52,7 +52,7 @@ pub struct Path {
 impl Path {
     pub fn text(&self) -> &'static str {
         unsafe {
-            let mut ptr = std::ptr::null_mut();
+            let mut ptr = std::ptr::null();
             ffi::sdf_Path_GetText(self.ptr, &mut ptr);
             CStr::from_ptr(ptr).to_str().unwrap()
         }
@@ -106,9 +106,9 @@ impl PathVector {
 
     pub fn at(&self, index: usize) -> PathRef {
         unsafe {
-            let mut ptr = std::ptr::null_mut();
+            let mut ptr = std::ptr::null();
             ffi::sdf_PathVector_op_index(self.ptr, index, &mut ptr);
-            PathRef { ptr }
+            PathRef { ptr: ptr as _ }
         }
     }
 
@@ -174,9 +174,9 @@ impl ValueTypeName {
 
     pub fn role(&self) -> tf::TokenRef {
         unsafe {
-            let mut ptr = std::ptr::null_mut();
+            let mut ptr = std::ptr::null();
             ffi::sdf_ValueTypeName_GetRole(self.ptr, &mut ptr);
-            tf::TokenRef { ptr }
+            tf::TokenRef { ptr: ptr as _ }
         }
     }
 }

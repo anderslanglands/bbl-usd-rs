@@ -1,0 +1,3 @@
+[submodule "bbl-usd"]
+	path = bbl-usd
+	url = https://github.com/expenses/bbl-usd

@@ -516,9 +516,9 @@ impl Value {
             let mut is_holding = false;
             ffi::vt_Value_IsHolding_TfToken(self.ptr, &mut is_holding);
             if is_holding {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_TfToken(self.ptr, &mut ptr);
-                Some(tf::TokenRef { ptr })
+                Some(tf::TokenRef { ptr: ptr as _ })
             } else {
                 None
             }
@@ -530,9 +530,9 @@ impl Value {
             let mut is_holding = false;
             ffi::vt_Value_IsHolding_VtTokenArray(self.ptr, &mut is_holding);
             if is_holding {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_VtTokenArray(self.ptr, &mut ptr);
-                Some(TokenArrayRef { ptr })
+                Some(TokenArrayRef { ptr: ptr as _ })
             } else {
                 None
             }
@@ -544,9 +544,9 @@ impl Value {
             let mut is_holding = false;
             ffi::vt_Value_IsHolding_VtIntArray(self.ptr, &mut is_holding);
             if is_holding {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_VtIntArray(self.ptr, &mut ptr);
-                Some(IntArrayRef { ptr })
+                Some(IntArrayRef { ptr: ptr as _ })
             } else {
                 None
             }
@@ -559,9 +559,9 @@ impl Value {
             let mut is_holding = false;
             ffi::vt_Value_IsHolding_VtFloatArray(self.ptr, &mut is_holding);
             if is_holding {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_VtFloatArray(self.ptr, &mut ptr);
-                Some(FloatArrayRef { ptr })
+                Some(FloatArrayRef { ptr: ptr as _ })
             } else {
                 None
             }
@@ -573,9 +573,9 @@ impl Value {
             let mut is_holding = false;
             ffi::vt_Value_IsHolding_VtDoubleArray(self.ptr, &mut is_holding);
             if is_holding {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_VtDoubleArray(self.ptr, &mut ptr);
-                Some(DoubleArrayRef { ptr })
+                Some(DoubleArrayRef { ptr: ptr as _ })
             } else {
                 None
             }
@@ -587,9 +587,9 @@ impl Value {
             let mut is_holding = false;
             ffi::vt_Value_IsHolding_VtVec2fArray(self.ptr, &mut is_holding);
             if is_holding {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_VtVec2fArray(self.ptr, &mut ptr);
-                Some(Vec2ArrayRef { ptr })
+                Some(Vec2ArrayRef { ptr: ptr as _ })
             } else {
                 None
             }
@@ -601,9 +601,9 @@ impl Value {
             let mut is_holding = false;
             ffi::vt_Value_IsHolding_VtVec3fArray(self.ptr, &mut is_holding);
             if is_holding {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_VtVec3fArray(self.ptr, &mut ptr);
-                Some(Vec3ArrayRef { ptr })
+                Some(Vec3ArrayRef { ptr: ptr as _ })
             } else {
                 None
             }
@@ -615,9 +615,9 @@ impl Value {
             let mut is_holding = false;
             ffi::vt_Value_IsHolding_VtVec4fArray(self.ptr, &mut is_holding);
             if is_holding {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_VtVec4fArray(self.ptr, &mut ptr);
-                Some(Vec4ArrayRef { ptr })
+                Some(Vec4ArrayRef { ptr: ptr as _ })
             } else {
                 None
             }
@@ -629,9 +629,9 @@ impl Value {
             let mut is_holding = false;
             ffi::vt_Value_IsHolding_SdfAssetPath(self.ptr, &mut is_holding);
             if is_holding {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_SdfAssetPath(self.ptr, &mut ptr);
-                Some(sdf::AssetPathRef { ptr })
+                Some(sdf::AssetPathRef { ptr: ptr as _ })
             } else {
                 None
             }
@@ -669,7 +669,7 @@ impl ValueMember for i32 {
     fn get(value: &Value) -> Option<&Self> {
         if Self::is_holding(value) {
             unsafe {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_int(value.ptr, &mut ptr);
                 Some(&*ptr)
             }
@@ -699,7 +699,7 @@ impl ValueMember for f32 {
     fn get(value: &Value) -> Option<&Self> {
         if Self::is_holding(value) {
             unsafe {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_float(value.ptr, &mut ptr);
                 Some(&*ptr)
             }
@@ -729,7 +729,7 @@ impl ValueMember for f64 {
     fn get(value: &Value) -> Option<&Self> {
         if Self::is_holding(value) {
             unsafe {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_double(value.ptr, &mut ptr);
                 Some(&*ptr)
             }
@@ -759,7 +759,7 @@ impl ValueMember for bool {
     fn get(value: &Value) -> Option<&Self> {
         if Self::is_holding(value) {
             unsafe {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_bool(value.ptr, &mut ptr);
                 Some(&*ptr)
             }
@@ -789,7 +789,7 @@ impl ValueMember for Vec2 {
     fn get(value: &Value) -> Option<&Self> {
         if Self::is_holding(value) {
             unsafe {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_GfVec2f(value.ptr, &mut ptr);
                 Some(&*(ptr as *mut Vec2))
             }
@@ -822,7 +822,7 @@ impl ValueMember for Vec3 {
     fn get(value: &Value) -> Option<&Self> {
         if Self::is_holding(value) {
             unsafe {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_GfVec3f(value.ptr, &mut ptr);
                 Some(&*(ptr as *mut Vec3))
             }
@@ -855,7 +855,7 @@ impl ValueMember for Vec4 {
     fn get(value: &Value) -> Option<&Self> {
         if Self::is_holding(value) {
             unsafe {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_GfVec4f(value.ptr, &mut ptr);
                 Some(&*(ptr as *mut Vec4))
             }

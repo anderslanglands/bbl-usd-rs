@@ -18,7 +18,7 @@ impl Stage {
     pub fn open<P: AsRef<Path>>(filename: P) -> Result<StageRefPtr, Error> {
         unsafe {
             let mut ptr = std::ptr::null_mut();
-            let initial_load_set = ffi::usd_StageInitialLoadSet::usd_StageInitialLoadSet_LoadAll;
+            let initial_load_set = ffi::usd_StageInitialLoadSet_usd_StageInitialLoadSet_LoadAll;
             let filename = filename.as_ref().to_string_lossy().to_string();
             let c_filename = CString::new(filename.clone()).unwrap();
             ffi::usd_Stage_Open(
@@ -90,9 +90,9 @@ pub trait Object {
 
     fn name(&self) -> tf::TokenRef {
         unsafe {
-            let mut ptr = std::ptr::null_mut();
+            let mut ptr = std::ptr::null();
             ffi::usd_Object_GetName(self._object_ptr(), &mut ptr);
-            tf::TokenRef { ptr }
+            tf::TokenRef { ptr: ptr as _ }
         }
     }
 }
@@ -104,9 +104,9 @@ pub struct Prim {
 impl Prim {
     pub fn type_name(&self) -> tf::TokenRef {
         unsafe {
-            let mut ptr = std::ptr::null_mut();
+            let mut ptr = std::ptr::null();
             ffi::usd_Prim_GetTypeName(self.ptr, &mut ptr);
-            tf::TokenRef { ptr }
+            tf::TokenRef { ptr: ptr as _ }
         }
     }
 
@@ -450,9 +450,9 @@ impl PropertyVector {
 
     pub fn at(&self, index: usize) -> PropertyRef {
         unsafe {
-            let mut ptr = std::ptr::null_mut();
+            let mut ptr = std::ptr::null();
             ffi::usd_PropertyVector_op_index(self.ptr, index, &mut ptr);
-            PropertyRef { ptr }
+            PropertyRef { ptr: ptr as _ }
         }
     }
 

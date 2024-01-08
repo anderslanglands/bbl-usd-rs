@@ -11,3 +11,4 @@ glam = {version = "0.24.2", features = ["scalar-math"]}
 [build-dependencies]
 # bbl-build = {git = "https://github.com/anderslanglands/bbl-build-rs.git"}
 bbl-build = {path = "../bbl-build-rs"}
+bindgen = "0.69.1"
