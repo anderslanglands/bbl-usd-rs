@@ -113,7 +113,7 @@ fn print_attribute(attr: &Attribute) {
                     .join(", ")
             );
         } else if let Some(val) = value.as_int_array() {
-            let size = val.size();
+            let size = val.len();
             let elide = if size < 8 { "" } else { "..." };
             println!(
                 "  {}: {} = {}:[{}{}]",
@@ -128,7 +128,7 @@ fn print_attribute(attr: &Attribute) {
                 elide
             );
         } else if let Some(val) = value.as_float_array() {
-            let size = val.size();
+            let size = val.len();
             let elide = if size < 8 { "" } else { "..." };
             println!(
                 "  {}: {} = {}:[{}{}]",
@@ -143,7 +143,7 @@ fn print_attribute(attr: &Attribute) {
                 elide
             );
         } else if let Some(val) = value.as_double_array() {
-            let size = val.size();
+            let size = val.len();
             let elide = if size < 8 { "" } else { "..." };
             println!(
                 "  {}: {} = {}:[{}{}]",
@@ -158,7 +158,7 @@ fn print_attribute(attr: &Attribute) {
                 elide
             );
         } else if let Some(val) = value.as_vec2_array() {
-            let size = val.size();
+            let size = val.len();
             let elide = if size < 5 { "" } else { "..." };
             println!(
                 "  {}: {} = {}:[{}{}]",
@@ -173,7 +173,7 @@ fn print_attribute(attr: &Attribute) {
                 elide
             );
         } else if let Some(val) = value.as_vec3_array() {
-            let size = val.size();
+            let size = val.len();
             let elide = if size < 5 { "" } else { "..." };
             println!(
                 "  {}: {} = {}:[{}{}]",
@@ -188,7 +188,7 @@ fn print_attribute(attr: &Attribute) {
                 elide
             );
         } else if let Some(val) = value.as_vec4_array() {
-            let size = val.size();
+            let size = val.len();
             let elide = if size < 5 { "" } else { "..." };
             println!(
                 "  {}: {} = {}:[{}{}]",
