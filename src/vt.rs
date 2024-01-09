@@ -75,13 +75,11 @@ impl std::ops::Deref for TokenArrayRef {
     }
 }
 
-use ffi::*;
-
 macro_rules! make_primitive_array {
     ($prefix:ident, $name:ident, $c_name:ident, $inner_type:ty) => {
         paste! {
             pub struct $name {
-                pub(crate) ptr: *mut [<$prefix _ $c_name _t>]
+                pub(crate) ptr: *mut ffi::[<$prefix _ $c_name _t>]
             }
 
             impl std::ops::Deref for $name {
@@ -90,10 +88,10 @@ macro_rules! make_primitive_array {
                 fn deref(&self) -> &Self::Target {
                     unsafe {
                         let mut size = 0;
-                        [<$prefix _ $c_name _size>](self.ptr, &mut size);
+                        ffi::[<$prefix _ $c_name _size>](self.ptr, &mut size);
 
                         let mut ptr = std::ptr::null();
-                        [<$prefix _ $c_name _data_const>](self.ptr, &mut ptr);
+                        ffi::[<$prefix _ $c_name _data_const>](self.ptr, &mut ptr);
 
                         std::slice::from_raw_parts(ptr as *const $inner_type, size)
                     }
@@ -101,7 +99,7 @@ macro_rules! make_primitive_array {
             }
 
             pub struct [<$name Ref>] {
-                pub(crate) ptr: *mut [<$prefix _ $c_name _t>]
+                pub(crate) ptr: *mut ffi::[<$prefix _ $c_name _t>]
             }
 
             impl std::ops::Deref for [<$name Ref>] {
