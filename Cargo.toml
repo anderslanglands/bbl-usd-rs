@@ -9,4 +9,4 @@ edition = "2021"
 glam = {version = "0.24.2", features = ["scalar-math"]}
 
 [build-dependencies]
-bbl-build = {git = "https://github.com/anderslanglands/bbl-build-rs.git", rev="d2c25a639905"}
+bbl-build = {git = "https://github.com/anderslanglands/bbl-build-rs.git", rev="1972f69"}
