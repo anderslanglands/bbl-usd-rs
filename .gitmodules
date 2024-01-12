@@ -1,0 +1,3 @@
+[submodule "bbl-usd"]
+	path = bbl-usd
+	url = git@github.com:anderslanglands/bbl-usd.git
