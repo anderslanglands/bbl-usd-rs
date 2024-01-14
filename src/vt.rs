@@ -259,6 +259,14 @@ impl Value {
             }
         }
     }
+
+    pub fn from_asset_path(path: &sdf::AssetPath) -> Self {
+        unsafe {
+            let mut ptr = std::ptr::null_mut();
+            ffi::vt_Value_from_SdfAssetPath(path.ptr, &mut ptr);
+            Self { ptr }
+        }
+    }
 }
 
 pub struct ValueRef {

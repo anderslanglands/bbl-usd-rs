@@ -61,10 +61,18 @@ impl StageRefPtr {
             ffi::usd_Prim_IsValid(ptr, &mut valid);
 
             if valid {
-                Ok(Prim{ptr})
+                Ok(Prim { ptr })
             } else {
-                Err(Error::NoPrimAtPath { path: path.text().to_string() })
+                Err(Error::NoPrimAtPath {
+                    path: path.text().to_string(),
+                })
             }
+        }
+    }
+
+    pub fn save(&self) {
+        unsafe {
+            ffi::usd_StageRefPtr_Save(self.ptr);
         }
     }
 }
@@ -502,7 +510,6 @@ impl<'a> IntoIterator for &'a PropertyVector {
     }
 }
 
-
 pub struct Attribute {
     ptr: *mut ffi::usd_Attribute_t,
 }
@@ -541,6 +548,14 @@ impl Attribute {
             let mut ptr = std::ptr::null_mut();
             ffi::usd_Attribute_GetTypeName(self.ptr, &mut ptr);
             sdf::ValueTypeName { ptr }
+        }
+    }
+
+    pub fn set(&mut self, value: &vt::Value) -> bool {
+        unsafe {
+            let mut result = false;
+            ffi::usd_Attribute_Set(self.ptr, value.ptr, TimeCode::default().0, &mut result);
+            result
         }
     }
 }

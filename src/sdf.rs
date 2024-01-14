@@ -6,6 +6,14 @@ pub struct AssetPath {
 }
 
 impl AssetPath {
+    pub fn from_path(path: &CStr) -> Self {
+        unsafe {
+            let mut ptr = std::ptr::null_mut();
+            ffi::sdf_AssetPath_from_path(path.as_ptr(), &mut ptr);
+            Self { ptr }
+        }
+    }
+
     pub fn asset_path(&self) -> &str {
         unsafe {
             let mut ptr = std::ptr::null();

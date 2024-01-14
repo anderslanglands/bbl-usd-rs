@@ -1,5 +1,5 @@
-use crate::ffi;
-use std::ffi::{CStr, CString};
+use crate::{cpp, ffi};
+use std::ffi::{c_void, CStr, CString};
 use std::fmt;
 
 pub struct Token {
