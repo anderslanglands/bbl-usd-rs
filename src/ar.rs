@@ -14,14 +14,6 @@ impl ResolvedPath {
         }
     }
 
-    pub fn default() -> Self {
-        unsafe {
-            let mut ptr = std::ptr::null_mut();
-            ffi::ar_ResolvedPath_default(&mut ptr);
-            Self { ptr }
-        }
-    }
-
     pub fn is_empty(&self) -> bool {
         unsafe {
             let mut is_empty = false;
