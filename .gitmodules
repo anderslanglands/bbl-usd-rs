@@ -1,4 +1,4 @@
 [submodule "bbl-usd"]
 	path = bbl-usd
 	url = https://github.com/expenses/bbl-usd
-	branch = pxr-libraries
+	branch = set-ar-resolver

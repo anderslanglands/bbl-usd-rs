@@ -39,6 +39,7 @@ impl Stage {
     }
 }
 
+#[derive(Debug)]
 pub struct StageRefPtr {
     ptr: *mut ffi::usd_StageRefPtr_t,
 }
@@ -85,6 +86,8 @@ impl Drop for StageRefPtr {
     }
 }
 
+unsafe impl Send for StageRefPtr {}
+
 pub trait Object {
     fn _object_ptr(&self) -> *mut ffi::usd_Object_t;
 
@@ -101,6 +104,19 @@ pub trait Object {
             let mut ptr = std::ptr::null();
             ffi::usd_Object_GetName(self._object_ptr(), &mut ptr);
             tf::TokenRef { ptr: ptr as _ }
+        }
+    }
+
+    fn display_name(&self) -> String {
+        unsafe {
+            let mut ptr = std::ptr::null_mut();
+            ffi::usd_Object_GetDisplayName(self._object_ptr(), &mut ptr);
+            let mut ptr_c_str = std::ptr::null();
+            ffi::std_String_c_str(ptr, &mut ptr_c_str);
+            let result = CStr::from_ptr(ptr_c_str).to_string_lossy().to_string();
+            ffi::std_String_dtor(ptr);
+
+            result
         }
     }
 }
@@ -378,6 +394,40 @@ pub trait PropertyEx {
         unsafe {
             let mut result = false;
             ffi::usd_Property_IsAuthored(self._property_ptr(), &mut result);
+            result
+        }
+    }
+
+    fn split_name(&self) -> Vec<String> {
+        unsafe {
+            let mut ptr = std::ptr::null_mut();
+            ffi::usd_Property_SplitName(self._property_ptr(), &mut ptr);
+            let mut size = 0;
+            ffi::std_StringVector_size(ptr, &mut size);
+            let mut result: Vec<String> = Vec::new();
+            for i in 0..size {
+                let mut ptr_str = std::ptr::null();
+                ffi::std_StringVector_op_index(ptr, i, &mut ptr_str);
+                let mut ptr_c_str = std::ptr::null();
+                ffi::std_String_c_str(ptr_str, &mut ptr_c_str);
+                result.push(CStr::from_ptr(ptr_c_str).to_string_lossy().to_string());
+            }
+
+            ffi::std_StringVector_dtor(ptr);
+
+            result
+        }
+    }
+
+    fn display_group(&self) -> String {
+        unsafe {
+            let mut ptr = std::ptr::null_mut();
+            ffi::usd_Property_GetDisplayGroup(self._property_ptr(), &mut ptr);
+            let mut ptr_c_str = std::ptr::null();
+            ffi::std_String_c_str(ptr, &mut ptr_c_str);
+            let result = CStr::from_ptr(ptr_c_str).to_string_lossy().to_string();
+            ffi::std_String_dtor(ptr);
+
             result
         }
     }

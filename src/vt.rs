@@ -2,7 +2,7 @@ use paste::paste;
 use std::ops::IndexMut;
 
 use crate::{ffi, sdf, tf};
-use glam::{Vec2, Vec3, Vec4};
+use glam::{Vec2, Vec3, Vec4, DVec3};
 
 pub struct TokenArray {
     pub(crate) ptr: *mut ffi::vt_TokenArray_t,
@@ -474,6 +474,39 @@ impl ValueMember for Vec3 {
             let mut ptr = std::ptr::null_mut();
             ffi::vt_Value_from_GfVec3f(
                 *(member as *const Vec3 as *const ffi::gf_Vec3f_t),
+                &mut ptr,
+            );
+            Value { ptr }
+        }
+    }
+}
+
+impl ValueMember for DVec3 {
+    fn get(value: &Value) -> Option<&Self> {
+        if Self::is_holding(value) {
+            unsafe {
+                let mut ptr = std::ptr::null();
+                ffi::vt_Value_Get_GfVec3d(value.ptr, &mut ptr);
+                Some(&*(ptr as *mut DVec3))
+            }
+        } else {
+            None
+        }
+    }
+
+    fn is_holding(value: &Value) -> bool {
+        unsafe {
+            let mut result = false;
+            ffi::vt_Value_IsHolding_GfVec3d(value.ptr, &mut result);
+            result
+        }
+    }
+
+    fn from(member: &Self) -> Value {
+        unsafe {
+            let mut ptr = std::ptr::null_mut();
+            ffi::vt_Value_from_GfVec3d(
+                *(member as *const DVec3 as *const ffi::gf_Vec3d_t),
                 &mut ptr,
             );
             Value { ptr }

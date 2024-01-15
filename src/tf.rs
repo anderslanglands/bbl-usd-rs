@@ -30,6 +30,12 @@ impl Drop for Token {
     }
 }
 
+impl AsRef<str> for Token {
+    fn as_ref(&self) -> &str {
+        self.text()
+    }
+}
+
 pub struct TokenRef {
     pub(crate) ptr: *mut ffi::tf_Token_t,
 }
@@ -45,6 +51,12 @@ impl std::ops::Deref for TokenRef {
 impl fmt::Display for TokenRef {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.text())
+    }
+}
+
+impl AsRef<str> for TokenRef {
+    fn as_ref(&self) -> &str {
+        self.text()
     }
 }
 
