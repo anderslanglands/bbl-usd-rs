@@ -149,6 +149,10 @@ impl Prim {
             PropertyVector { ptr }
         }
     }
+
+    pub fn ptr(&self) -> *const ffi::usd_Prim_t {
+        self.ptr
+    }
 }
 
 impl Object for Prim {
