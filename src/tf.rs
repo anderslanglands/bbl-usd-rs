@@ -7,6 +7,15 @@ pub struct Token {
 }
 
 impl Token {
+pub fn new(name: &str) -> Self {
+        let c_name = CString::new(name).unwrap();
+        unsafe {
+            let mut ptr = std::ptr::null_mut();
+            ffi::tf_Token_new(c_name.as_ptr(), &mut ptr);
+            Self { ptr }
+        }
+    }
+
     pub fn text(&self) -> &'static str {
         unsafe {
             let mut ptr = std::ptr::null();

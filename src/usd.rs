@@ -2,6 +2,7 @@ use crate::ffi;
 use crate::sdf;
 use crate::tf;
 use crate::vt;
+use crate::cpp;
 
 use std::ffi::{CStr, CString};
 use std::path::Path;
@@ -9,6 +10,7 @@ use std::path::Path;
 #[derive(Debug)]
 pub enum Error {
     StageOpen { filename: String },
+    StageCreateNew { filename: String },
     NoPrimAtPath { path: String },
 }
 
@@ -34,6 +36,42 @@ impl Stage {
                 Err(Error::StageOpen { filename })
             } else {
                 Ok(StageRefPtr { ptr })
+            }
+        }
+    }
+
+    pub fn create_new<P: AsRef<Path>>(filename: P) -> Result<StageRefPtr, Error> {
+        unsafe {
+            let mut ptr = std::ptr::null_mut();
+            let initial_load_set = ffi::usd_StageInitialLoadSet_usd_StageInitialLoadSet_LoadAll;
+            let filename = filename.as_ref().to_string_lossy().to_string();
+            let c_filename = CString::new(filename.clone()).unwrap();
+            let cpp_filename = cpp::String::new(&c_filename);
+            ffi::usd_Stage_CreateNew(
+                cpp_filename.ptr,
+                initial_load_set,
+                &mut ptr,
+            );
+
+            let mut is_invalid = true;
+            ffi::usd_StageRefPtr_is_invalid(ptr, &mut is_invalid);
+
+            if is_invalid {
+                Err(Error::StageCreateNew { filename })
+            } else {
+                Ok(StageRefPtr { ptr })
+            }
+        }
+    }
+
+    pub fn create_in_memory() -> StageRefPtr {
+        unsafe {
+            let mut ptr = std::ptr::null_mut();
+            ffi::usd_Stage_CreateInMemory(
+                ffi::usd_StageInitialLoadSet_usd_StageInitialLoadSet_LoadAll,
+                &mut ptr);
+                StageRefPtr {
+                ptr
             }
         }
     }
@@ -71,9 +109,48 @@ impl StageRefPtr {
         }
     }
 
+    pub fn define_prim<P: Into<sdf::Path>>(&self, path: P, ty: &str) -> Result<Prim, Error> {
+        let path = path.into();
+        let token = tf::Token::new(ty);
+        unsafe {
+            let mut ptr = std::ptr::null_mut();
+            ffi::usd_StageRefPtr_DefinePrim(self.ptr, path.ptr, token.ptr, &mut ptr);
+
+            let mut valid = false;
+            ffi::usd_Prim_IsValid(ptr, &mut valid);
+
+            if valid {
+                Ok(Prim { ptr })
+            } else {
+                Err(Error::NoPrimAtPath {
+                    path: path.text().to_string(),
+                })
+            }
+        }
+    }
+
     pub fn save(&self) {
         unsafe {
             ffi::usd_StageRefPtr_Save(self.ptr);
+        }
+    }
+
+    pub fn export_to_string(&self) -> Option<cpp::String> {
+        unsafe {
+            let mut string = cpp::String::default();
+            let mut result = false;
+            ffi::usd_StageRefPtr_ExportToString(
+                self.ptr,
+                &mut string.ptr,
+                false,
+                &mut result
+            );
+            if result {
+                Some(string)
+            }
+            else {
+                None
+            }
         }
     }
 }
@@ -612,6 +689,14 @@ impl Attribute {
             result
         }
     }
+
+    pub fn set_at(&mut self, value: &vt::Value, time: TimeCode) -> bool {
+        unsafe {
+            let mut result = false;
+            ffi::usd_Attribute_Set(self.ptr, value.ptr, time.0, &mut result);
+            result
+        }
+    }
 }
 
 impl Object for Attribute {
@@ -719,7 +804,16 @@ pub enum PropertyKind {
 }
 
 #[repr(transparent)]
-pub struct TimeCode(ffi::usd_TimeCode_t);
+#[derive(Clone, Copy)]
+pub struct TimeCode(pub ffi::usd_TimeCode_t);
+
+impl TimeCode {
+    pub fn from_time(time: f64) -> Self {
+        Self(ffi::usd_TimeCode_t {
+            time
+        })
+    }
+}
 
 impl Default for TimeCode {
     fn default() -> Self {

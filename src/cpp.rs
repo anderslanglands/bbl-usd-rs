@@ -28,6 +28,18 @@ impl String {
     }
 }
 
+impl Default for String {
+    fn default() -> Self {
+        unsafe {
+            let mut ptr = std::ptr::null_mut();
+            ffi::std_String_default(&mut ptr);
+            Self {
+                ptr
+            }
+        }
+    }
+}
+
 impl Drop for String {
     fn drop(&mut self) {
         unsafe {

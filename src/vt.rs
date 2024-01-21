@@ -267,6 +267,22 @@ impl Value {
             Self { ptr }
         }
     }
+
+    pub fn from_dvec3(vec3: glam::DVec3) -> Self {
+        unsafe {
+            let mut ptr = std::ptr::null_mut();
+            ffi::vt_Value_from_GfVec3d(*(&vec3 as *const glam::DVec3 as *const _), &mut ptr);
+            Self { ptr }
+        }
+    }
+
+    pub fn from_dquat(quat: glam::DQuat) -> Self {
+        unsafe {
+            let mut ptr = std::ptr::null_mut();
+            ffi::vt_Value_from_GfQuatd(*(&quat as *const glam::DQuat as *const _), &mut ptr);
+            Self { ptr }
+        }
+    }
 }
 
 pub struct ValueRef {
