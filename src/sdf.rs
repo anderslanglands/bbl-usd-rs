@@ -201,3 +201,19 @@ pub enum Variability {
     Varying,
     Uniform,
 }
+
+pub struct LayerOffset {
+    pub(crate) ptr: *mut ffi::sdf_LayerOffset_t
+}
+
+impl Default for LayerOffset {
+    fn default() -> Self {
+        unsafe {
+            let mut ptr = std::ptr::null_mut();
+            ffi::sdf_LayerOffset_default(&mut ptr);
+            Self {
+                ptr
+            }
+        }
+    }
+}
