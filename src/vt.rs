@@ -283,6 +283,16 @@ impl Value {
             Self { ptr }
         }
     }
+
+    pub fn from_bool(value: bool) -> Self {
+        unsafe {
+            let mut ptr = std::ptr::null_mut();
+            ffi::vt_Value_from_bool(value, &mut ptr);
+            Self {
+                ptr
+            }
+        }
+    }
 }
 
 pub struct ValueRef {
