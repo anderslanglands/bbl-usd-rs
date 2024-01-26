@@ -7,6 +7,8 @@ edition = "2021"
 
 [dependencies]
 glam = {version = "0.24.2", features = ["scalar-math"]}
+paste = "1.0.14"
 
 [build-dependencies]
 bbl-build = {git = "https://github.com/anderslanglands/bbl-build-rs.git", rev="fd2a2d1"}
+bindgen = "0.69.2"
