@@ -1,7 +1,7 @@
 use std::ops::IndexMut;
 
 use crate::{ffi, sdf, tf};
-use glam::{Vec2, Vec3, Vec4, DVec3};
+use glam::{DVec3, Vec2, Vec3, Vec4};
 
 pub struct TokenArray {
     pub(crate) ptr: *mut ffi::vt_TokenArray_t,
@@ -63,7 +63,7 @@ impl<'a> Iterator for TokenArrayIterator<'a> {
 }
 
 pub struct TokenArrayRef {
-    pub(crate) ptr: *mut ffi::vt_TokenArray_t,
+    pub(crate) ptr: *const ffi::vt_TokenArray_t,
 }
 
 impl std::ops::Deref for TokenArrayRef {
@@ -79,6 +79,15 @@ pub struct IntArray {
 }
 
 impl IntArray {
+    pub fn new(values: &[i32]) -> Self {
+        unsafe {
+            let range = values.as_ptr_range();
+            let mut ptr = std::ptr::null_mut();
+            ffi::vt_IntArray_from_range(range.start, range.end, &mut ptr);
+            IntArray { ptr }
+        }
+    }
+
     pub fn size(&self) -> usize {
         unsafe {
             let mut result = 0;
@@ -134,7 +143,7 @@ impl<'a> Iterator for IntArrayIterator<'a> {
 }
 
 pub struct IntArrayRef {
-    pub(crate) ptr: *mut ffi::vt_IntArray_t,
+    pub(crate) ptr: *const ffi::vt_IntArray_t,
 }
 
 impl std::ops::Deref for IntArrayRef {
@@ -205,7 +214,7 @@ impl<'a> Iterator for FloatArrayIterator<'a> {
 }
 
 pub struct FloatArrayRef {
-    pub(crate) ptr: *mut ffi::vt_FloatArray_t,
+    pub(crate) ptr: *const ffi::vt_FloatArray_t,
 }
 
 impl std::ops::Deref for FloatArrayRef {
@@ -276,7 +285,7 @@ impl<'a> Iterator for DoubleArrayIterator<'a> {
 }
 
 pub struct DoubleArrayRef {
-    pub(crate) ptr: *mut ffi::vt_DoubleArray_t,
+    pub(crate) ptr: *const ffi::vt_DoubleArray_t,
 }
 
 impl std::ops::Deref for DoubleArrayRef {
@@ -347,7 +356,7 @@ impl<'a> Iterator for Vec2ArrayIterator<'a> {
 }
 
 pub struct Vec2ArrayRef {
-    pub(crate) ptr: *mut ffi::gf_Vec2fArray_t,
+    pub(crate) ptr: *const ffi::gf_Vec2fArray_t,
 }
 
 impl std::ops::Deref for Vec2ArrayRef {
@@ -363,6 +372,19 @@ pub struct Vec3Array {
 }
 
 impl Vec3Array {
+    pub fn new(data: &[Vec3]) -> Self {
+        unsafe {
+            let range = data.as_ptr_range();
+            let mut ptr = std::ptr::null_mut();
+            ffi::gf_Vec3fArray_from_range(
+                range.start as *const ffi::gf_Vec3f_t,
+                range.end as *const ffi::gf_Vec3f_t,
+                &mut ptr,
+            );
+            Vec3Array { ptr }
+        }
+    }
+
     pub fn size(&self) -> usize {
         unsafe {
             let mut result = 0;
@@ -418,7 +440,7 @@ impl<'a> Iterator for Vec3ArrayIterator<'a> {
 }
 
 pub struct Vec3ArrayRef {
-    pub(crate) ptr: *mut ffi::gf_Vec3fArray_t,
+    pub(crate) ptr: *const ffi::gf_Vec3fArray_t,
 }
 
 impl std::ops::Deref for Vec3ArrayRef {
@@ -489,7 +511,7 @@ impl<'a> Iterator for Vec4ArrayIterator<'a> {
 }
 
 pub struct Vec4ArrayRef {
-    pub(crate) ptr: *mut ffi::gf_Vec4fArray_t,
+    pub(crate) ptr: *const ffi::gf_Vec4fArray_t,
 }
 
 impl std::ops::Deref for Vec4ArrayRef {
@@ -516,7 +538,7 @@ impl Value {
             let mut is_holding = false;
             ffi::vt_Value_IsHolding_TfToken(self.ptr, &mut is_holding);
             if is_holding {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_TfToken(self.ptr, &mut ptr);
                 Some(tf::TokenRef { ptr })
             } else {
@@ -530,7 +552,7 @@ impl Value {
             let mut is_holding = false;
             ffi::vt_Value_IsHolding_VtTokenArray(self.ptr, &mut is_holding);
             if is_holding {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_VtTokenArray(self.ptr, &mut ptr);
                 Some(TokenArrayRef { ptr })
             } else {
@@ -544,7 +566,7 @@ impl Value {
             let mut is_holding = false;
             ffi::vt_Value_IsHolding_VtIntArray(self.ptr, &mut is_holding);
             if is_holding {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_VtIntArray(self.ptr, &mut ptr);
                 Some(IntArrayRef { ptr })
             } else {
@@ -553,13 +575,12 @@ impl Value {
         }
     }
 
-
     pub fn as_float_array(&self) -> Option<FloatArrayRef> {
         unsafe {
             let mut is_holding = false;
             ffi::vt_Value_IsHolding_VtFloatArray(self.ptr, &mut is_holding);
             if is_holding {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_VtFloatArray(self.ptr, &mut ptr);
                 Some(FloatArrayRef { ptr })
             } else {
@@ -573,7 +594,7 @@ impl Value {
             let mut is_holding = false;
             ffi::vt_Value_IsHolding_VtDoubleArray(self.ptr, &mut is_holding);
             if is_holding {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_VtDoubleArray(self.ptr, &mut ptr);
                 Some(DoubleArrayRef { ptr })
             } else {
@@ -587,7 +608,7 @@ impl Value {
             let mut is_holding = false;
             ffi::vt_Value_IsHolding_VtVec2fArray(self.ptr, &mut is_holding);
             if is_holding {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_VtVec2fArray(self.ptr, &mut ptr);
                 Some(Vec2ArrayRef { ptr })
             } else {
@@ -601,7 +622,7 @@ impl Value {
             let mut is_holding = false;
             ffi::vt_Value_IsHolding_VtVec3fArray(self.ptr, &mut is_holding);
             if is_holding {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_VtVec3fArray(self.ptr, &mut ptr);
                 Some(Vec3ArrayRef { ptr })
             } else {
@@ -615,7 +636,7 @@ impl Value {
             let mut is_holding = false;
             ffi::vt_Value_IsHolding_VtVec4fArray(self.ptr, &mut is_holding);
             if is_holding {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_VtVec4fArray(self.ptr, &mut ptr);
                 Some(Vec4ArrayRef { ptr })
             } else {
@@ -629,7 +650,7 @@ impl Value {
             let mut is_holding = false;
             ffi::vt_Value_IsHolding_SdfAssetPath(self.ptr, &mut is_holding);
             if is_holding {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_SdfAssetPath(self.ptr, &mut ptr);
                 Some(sdf::AssetPathRef { ptr })
             } else {
@@ -662,14 +683,14 @@ impl Drop for Value {
 pub trait ValueMember {
     fn get(value: &Value) -> Option<&Self>;
     fn is_holding(value: &Value) -> bool;
-    fn from(member: &Self) -> Value;
+    fn as_value(member: &Self) -> Value;
 }
 
 impl ValueMember for i32 {
     fn get(value: &Value) -> Option<&Self> {
         if Self::is_holding(value) {
             unsafe {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_int(value.ptr, &mut ptr);
                 Some(&*ptr)
             }
@@ -686,10 +707,40 @@ impl ValueMember for i32 {
         }
     }
 
-    fn from(member: &Self) -> Value {
+    fn as_value(member: &Self) -> Value {
         unsafe {
             let mut ptr = std::ptr::null_mut();
             ffi::vt_Value_from_int(*member, &mut ptr);
+            Value { ptr }
+        }
+    }
+}
+
+impl ValueMember for IntArray {
+    fn get(value: &Value) -> Option<&Self> {
+        if Self::is_holding(value) {
+            unsafe {
+                let mut ptr = std::ptr::null();
+                ffi::vt_Value_Get_VtIntArray(value.ptr, &mut ptr);
+                Some(&*(ptr as *mut IntArray))
+            }
+        } else {
+            None
+        }
+    }
+
+    fn is_holding(value: &Value) -> bool {
+        unsafe {
+            let mut result = false;
+            ffi::vt_Value_IsHolding_VtIntArray(value.ptr, &mut result);
+            result
+        }
+    }
+
+    fn as_value(member: &Self) -> Value {
+        unsafe {
+            let mut ptr = std::ptr::null_mut();
+            ffi::vt_Value_from_VtIntArray(member.ptr, &mut ptr);
             Value { ptr }
         }
     }
@@ -699,7 +750,7 @@ impl ValueMember for f32 {
     fn get(value: &Value) -> Option<&Self> {
         if Self::is_holding(value) {
             unsafe {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_float(value.ptr, &mut ptr);
                 Some(&*ptr)
             }
@@ -716,7 +767,7 @@ impl ValueMember for f32 {
         }
     }
 
-    fn from(member: &Self) -> Value {
+    fn as_value(member: &Self) -> Value {
         unsafe {
             let mut ptr = std::ptr::null_mut();
             ffi::vt_Value_from_float(*member, &mut ptr);
@@ -729,7 +780,7 @@ impl ValueMember for f64 {
     fn get(value: &Value) -> Option<&Self> {
         if Self::is_holding(value) {
             unsafe {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_double(value.ptr, &mut ptr);
                 Some(&*ptr)
             }
@@ -746,7 +797,7 @@ impl ValueMember for f64 {
         }
     }
 
-    fn from(member: &Self) -> Value {
+    fn as_value(member: &Self) -> Value {
         unsafe {
             let mut ptr = std::ptr::null_mut();
             ffi::vt_Value_from_double(*member, &mut ptr);
@@ -759,7 +810,7 @@ impl ValueMember for bool {
     fn get(value: &Value) -> Option<&Self> {
         if Self::is_holding(value) {
             unsafe {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_bool(value.ptr, &mut ptr);
                 Some(&*ptr)
             }
@@ -776,7 +827,7 @@ impl ValueMember for bool {
         }
     }
 
-    fn from(member: &Self) -> Value {
+    fn as_value(member: &Self) -> Value {
         unsafe {
             let mut ptr = std::ptr::null_mut();
             ffi::vt_Value_from_bool(*member, &mut ptr);
@@ -789,7 +840,7 @@ impl ValueMember for Vec2 {
     fn get(value: &Value) -> Option<&Self> {
         if Self::is_holding(value) {
             unsafe {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_GfVec2f(value.ptr, &mut ptr);
                 Some(&*(ptr as *mut Vec2))
             }
@@ -806,7 +857,7 @@ impl ValueMember for Vec2 {
         }
     }
 
-    fn from(member: &Self) -> Value {
+    fn as_value(member: &Self) -> Value {
         unsafe {
             let mut ptr = std::ptr::null_mut();
             ffi::vt_Value_from_GfVec2f(
@@ -822,7 +873,7 @@ impl ValueMember for Vec3 {
     fn get(value: &Value) -> Option<&Self> {
         if Self::is_holding(value) {
             unsafe {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_GfVec3f(value.ptr, &mut ptr);
                 Some(&*(ptr as *mut Vec3))
             }
@@ -839,7 +890,7 @@ impl ValueMember for Vec3 {
         }
     }
 
-    fn from(member: &Self) -> Value {
+    fn as_value(member: &Self) -> Value {
         unsafe {
             let mut ptr = std::ptr::null_mut();
             ffi::vt_Value_from_GfVec3f(
@@ -851,11 +902,41 @@ impl ValueMember for Vec3 {
     }
 }
 
+impl ValueMember for Vec3Array {
+    fn get(value: &Value) -> Option<&Self> {
+        if Self::is_holding(value) {
+            unsafe {
+                let mut ptr = std::ptr::null();
+                ffi::vt_Value_Get_VtVec3fArray(value.ptr, &mut ptr);
+                Some(&*(ptr as *mut Vec3Array))
+            }
+        } else {
+            None
+        }
+    }
+
+    fn is_holding(value: &Value) -> bool {
+        unsafe {
+            let mut result = false;
+            ffi::vt_Value_IsHolding_VtVec3fArray(value.ptr, &mut result);
+            result
+        }
+    }
+
+    fn as_value(member: &Self) -> Value {
+        unsafe {
+            let mut ptr = std::ptr::null_mut();
+            ffi::vt_Value_from_VtVec3fArray(member.ptr, &mut ptr);
+            Value { ptr }
+        }
+    }
+}
+
 impl ValueMember for DVec3 {
     fn get(value: &Value) -> Option<&Self> {
         if Self::is_holding(value) {
             unsafe {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_GfVec3d(value.ptr, &mut ptr);
                 Some(&*(ptr as *mut DVec3))
             }
@@ -872,7 +953,7 @@ impl ValueMember for DVec3 {
         }
     }
 
-    fn from(member: &Self) -> Value {
+    fn as_value(member: &Self) -> Value {
         unsafe {
             let mut ptr = std::ptr::null_mut();
             ffi::vt_Value_from_GfVec3d(
@@ -888,7 +969,7 @@ impl ValueMember for Vec4 {
     fn get(value: &Value) -> Option<&Self> {
         if Self::is_holding(value) {
             unsafe {
-                let mut ptr = std::ptr::null_mut();
+                let mut ptr = std::ptr::null();
                 ffi::vt_Value_Get_GfVec4f(value.ptr, &mut ptr);
                 Some(&*(ptr as *mut Vec4))
             }
@@ -905,7 +986,7 @@ impl ValueMember for Vec4 {
         }
     }
 
-    fn from(member: &Self) -> Value {
+    fn as_value(member: &Self) -> Value {
         unsafe {
             let mut ptr = std::ptr::null_mut();
             ffi::vt_Value_from_GfVec4f(

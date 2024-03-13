@@ -8,7 +8,7 @@ pub struct String {
 impl String {
     pub fn as_str(&self) -> &str {
         unsafe {
-            let mut ptr = std::ptr::null_mut();
+            let mut ptr = std::ptr::null();
             ffi::std_String_c_str(self.ptr, &mut ptr);
             let cstr = CStr::from_ptr(ptr).to_str().unwrap();
             cstr

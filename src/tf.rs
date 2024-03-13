@@ -7,9 +7,19 @@ pub struct Token {
 }
 
 impl Token {
-    pub fn text(&self) -> &'static str {
+    pub fn new(text: &str) -> Token {
         unsafe {
             let mut ptr = std::ptr::null_mut();
+            let text = CString::new(text).unwrap();
+            ffi::tf_Token_new(text.as_ptr(), &mut ptr);
+            std::mem::forget(text);
+            Token { ptr }
+        }
+    }
+
+    pub fn text(&self) -> &'static str {
+        unsafe {
+            let mut ptr = std::ptr::null();
             ffi::tf_Token_GetText(self.ptr, &mut ptr);
             CStr::from_ptr(ptr).to_str().unwrap()
         }
@@ -37,7 +47,7 @@ impl AsRef<str> for Token {
 }
 
 pub struct TokenRef {
-    pub(crate) ptr: *mut ffi::tf_Token_t,
+    pub(crate) ptr: *const ffi::tf_Token_t,
 }
 
 impl std::ops::Deref for TokenRef {
