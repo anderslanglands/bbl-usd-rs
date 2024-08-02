@@ -21,11 +21,7 @@ impl Stage {
             let initial_load_set = ffi::usd_StageInitialLoadSet::usd_StageInitialLoadSet_LoadAll;
             let filename = filename.as_ref().to_string_lossy().to_string();
             let c_filename = CString::new(filename.clone()).unwrap();
-            ffi::usd_Stage_Open(
-                c_filename.as_ptr(),
-                initial_load_set,
-                &mut ptr,
-            );
+            ffi::usd_Stage_Open(c_filename.as_ptr(), initial_load_set, &mut ptr);
 
             let mut is_invalid = true;
             ffi::usd_StageRefPtr_is_invalid(ptr, &mut is_invalid);
@@ -42,11 +38,7 @@ impl Stage {
         unsafe {
             let mut ptr = std::ptr::null_mut();
             let initial_load_set = ffi::usd_StageInitialLoadSet::usd_StageInitialLoadSet_LoadAll;
-            ffi::usd_Stage_Open_at_root(
-                layer.ptr,
-                initial_load_set,
-                &mut ptr,
-            );
+            ffi::usd_Stage_Open_at_root(layer.ptr, initial_load_set, &mut ptr);
             StageRefPtr { ptr }
         }
     }
@@ -75,9 +67,11 @@ impl StageRefPtr {
             ffi::usd_Prim_IsValid(ptr, &mut valid);
 
             if valid {
-                Ok(Prim{ptr})
+                Ok(Prim { ptr })
             } else {
-                Err(Error::NoPrimAtPath { path: path.text().to_string() })
+                Err(Error::NoPrimAtPath {
+                    path: path.text().to_string(),
+                })
             }
         }
     }
@@ -164,6 +158,14 @@ impl Prim {
             let mut ptr = std::ptr::null_mut();
             ffi::usd_Prim_GetProperties(self.ptr, &mut ptr);
             PropertyVector { ptr }
+        }
+    }
+
+    pub fn get_parent(&self) -> Prim {
+        unsafe {
+            let mut ptr = std::ptr::null_mut();
+            ffi::usd_Prim_GetParent(self.ptr, &mut ptr);
+            Prim { ptr }
         }
     }
 }
@@ -577,7 +579,6 @@ impl<'a> IntoIterator for &'a PropertyVector {
     }
 }
 
-
 pub struct Attribute {
     pub(crate) ptr: *mut ffi::usd_Attribute_t,
 }
@@ -608,6 +609,13 @@ impl Attribute {
             } else {
                 None
             }
+        }
+    }
+
+    pub fn get_connections(&self, sources: &mut sdf::PathVector) {
+        unsafe {
+            let mut result = false;
+            ffi::usd_Attribute_GetConnections(self.ptr, sources.ptr, &mut result);
         }
     }
 
@@ -732,7 +740,7 @@ pub enum PropertyKind {
 }
 
 #[repr(transparent)]
-pub struct TimeCode(ffi::usd_TimeCode_t);
+pub struct TimeCode(pub ffi::usd_TimeCode_t);
 
 impl Default for TimeCode {
     fn default() -> Self {

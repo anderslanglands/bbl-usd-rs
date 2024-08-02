@@ -1,5 +1,5 @@
 use bbl_usd::usd::{self, Attribute, Object, PropertyKind};
-use glam::{Vec2, Vec3, Vec4};
+use glam::{Vec2, Vec3, Vec4, Mat2, DMat2, Mat3, DMat3, Mat4, DMat4};
 
 pub fn main() {
     let stage = usd::Stage::open("bbl-usd/test01.usda").expect("failed to open stage");
@@ -96,6 +96,48 @@ fn print_attribute(attr: &Attribute) {
                 val
             );
         } else if let Some(val) = value.get::<Vec4>() {
+            println!(
+                "  {}: {} = {}",
+                attr.name().text(),
+                attr.type_name().as_token(),
+                val
+            );
+        } else if let Some(val) = value.get::<Mat2>() {
+            println!(
+                "  {}: {} = {}",
+                attr.name().text(),
+                attr.type_name().as_token(),
+                val
+            );
+        } else if let Some(val) = value.get::<DMat2>() {
+            println!(
+                "  {}: {} = {}",
+                attr.name().text(),
+                attr.type_name().as_token(),
+                val
+            );
+        } else if let Some(val) = value.get::<Mat3>() {
+            println!(
+                "  {}: {} = {}",
+                attr.name().text(),
+                attr.type_name().as_token(),
+                val
+            );
+        } else if let Some(val) = value.get::<DMat3>() {
+            println!(
+                "  {}: {} = {}",
+                attr.name().text(),
+                attr.type_name().as_token(),
+                val
+            );
+        } else if let Some(val) = value.get::<Mat4>() {
+            println!(
+                "  {}: {} = {}",
+                attr.name().text(),
+                attr.type_name().as_token(),
+                val
+            );
+        } else if let Some(val) = value.get::<DMat4>() {
             println!(
                 "  {}: {} = {}",
                 attr.name().text(),

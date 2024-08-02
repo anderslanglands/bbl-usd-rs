@@ -1,6 +1,7 @@
 mod ffi;
 pub mod usd;
 pub mod usd_geom;
+pub mod usd_shade;
 pub mod tf;
 pub mod sdf;
 pub mod cpp;

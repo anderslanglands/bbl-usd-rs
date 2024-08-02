@@ -70,3 +70,71 @@ impl AsRef<str> for TokenRef {
     }
 }
 
+pub struct TokenVector {
+    pub(crate) ptr: *mut ffi::tf_TokenVector_t,
+}
+
+impl TokenVector {
+    pub fn size(&self) -> usize {
+        unsafe {
+            let mut size = 0;
+            ffi::tf_TokenVector_size(self.ptr, &mut size);
+            size
+        }
+    }
+
+    pub fn at(&self, index: usize) -> TokenRef {
+        unsafe {
+            let mut ptr = std::ptr::null();
+            ffi::tf_TokenVector_op_index(self.ptr, index, &mut ptr);
+            TokenRef { ptr }
+        }
+    }
+
+    pub fn iter(&self) -> TokenVectorIterator {
+        TokenVectorIterator {
+            vec: self,
+            current: 0,
+            end: self.size(),
+        }
+    }
+}
+
+impl Drop for TokenVector {
+    fn drop(&mut self) {
+        unsafe {
+            ffi::tf_TokenVector_dtor(self.ptr);
+        }
+    }
+}
+
+impl Default for TokenVector {
+    fn default() -> Self {
+        unsafe {
+            let mut ptr = std::ptr::null_mut();
+            ffi::tf_TokenVector_default(&mut ptr);
+            TokenVector { ptr }
+        }
+    }
+}
+
+pub struct TokenVectorIterator<'a> {
+    vec: &'a TokenVector,
+    current: usize,
+    end: usize,
+}
+
+impl<'a> Iterator for TokenVectorIterator<'a> {
+    type Item = TokenRef;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.current == self.end {
+            None
+        } else {
+            let cur = self.current;
+            self.current += 1;
+            Some(self.vec.at(cur))
+        }
+    }
+}
+

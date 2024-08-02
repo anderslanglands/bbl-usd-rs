@@ -1,7 +1,7 @@
 use std::ops::IndexMut;
 
 use crate::{ffi, sdf, tf};
-use glam::{DVec3, Vec2, Vec3, Vec4};
+pub use glam::{DVec3, Vec2, Vec3, Vec4, Mat2, DMat2, Mat3, DMat3, Mat4, DMat4};
 
 pub struct TokenArray {
     pub(crate) ptr: *mut ffi::vt_TokenArray_t,
@@ -991,6 +991,204 @@ impl ValueMember for Vec4 {
             let mut ptr = std::ptr::null_mut();
             ffi::vt_Value_from_GfVec4f(
                 *(member as *const Vec4 as *const ffi::gf_Vec4f_t),
+                &mut ptr,
+            );
+            Value { ptr }
+        }
+    }
+}
+
+impl ValueMember for Mat2 {
+    fn get(value: &Value) -> Option<&Self> {
+        if Self::is_holding(value) {
+            unsafe {
+                let mut ptr = std::ptr::null();
+                ffi::vt_Value_Get_GfMatrix3f(value.ptr, &mut ptr);
+                Some(&*(ptr as *mut Mat2))
+            }
+        } else {
+            None
+        }
+    }
+
+    fn is_holding(value: &Value) -> bool {
+        unsafe {
+            let mut result = false;
+            ffi::vt_Value_IsHolding_GfMatrix2f(value.ptr, &mut result);
+            result
+        }
+    }
+
+    fn as_value(member: &Self) -> Value {
+        unsafe {
+            let mut ptr = std::ptr::null_mut();
+            ffi::vt_Value_from_GfMatrix2f(
+                *(member as *const Mat2 as *const ffi::gf_Matrix2f_t),
+                &mut ptr,
+            );
+            Value { ptr }
+        }
+    }
+}
+
+impl ValueMember for DMat2 {
+    fn get(value: &Value) -> Option<&Self> {
+        if Self::is_holding(value) {
+            unsafe {
+                let mut ptr = std::ptr::null();
+                ffi::vt_Value_Get_GfMatrix3d(value.ptr, &mut ptr);
+                Some(&*(ptr as *mut DMat2))
+            }
+        } else {
+            None
+        }
+    }
+
+    fn is_holding(value: &Value) -> bool {
+        unsafe {
+            let mut result = false;
+            ffi::vt_Value_IsHolding_GfMatrix2d(value.ptr, &mut result);
+            result
+        }
+    }
+
+    fn as_value(member: &Self) -> Value {
+        unsafe {
+            let mut ptr = std::ptr::null_mut();
+            ffi::vt_Value_from_GfMatrix2d(
+                *(member as *const DMat2 as *const ffi::gf_Matrix2d_t),
+                &mut ptr,
+            );
+            Value { ptr }
+        }
+    }
+}
+
+impl ValueMember for Mat3 {
+    fn get(value: &Value) -> Option<&Self> {
+        if Self::is_holding(value) {
+            unsafe {
+                let mut ptr = std::ptr::null();
+                ffi::vt_Value_Get_GfMatrix3f(value.ptr, &mut ptr);
+                Some(&*(ptr as *mut Mat3))
+            }
+        } else {
+            None
+        }
+    }
+
+    fn is_holding(value: &Value) -> bool {
+        unsafe {
+            let mut result = false;
+            ffi::vt_Value_IsHolding_GfMatrix3f(value.ptr, &mut result);
+            result
+        }
+    }
+
+    fn as_value(member: &Self) -> Value {
+        unsafe {
+            let mut ptr = std::ptr::null_mut();
+            ffi::vt_Value_from_GfMatrix3f(
+                *(member as *const Mat3 as *const ffi::gf_Matrix3f_t),
+                &mut ptr,
+            );
+            Value { ptr }
+        }
+    }
+}
+
+impl ValueMember for DMat3 {
+    fn get(value: &Value) -> Option<&Self> {
+        if Self::is_holding(value) {
+            unsafe {
+                let mut ptr = std::ptr::null();
+                ffi::vt_Value_Get_GfMatrix3d(value.ptr, &mut ptr);
+                Some(&*(ptr as *mut DMat3))
+            }
+        } else {
+            None
+        }
+    }
+
+    fn is_holding(value: &Value) -> bool {
+        unsafe {
+            let mut result = false;
+            ffi::vt_Value_IsHolding_GfMatrix3d(value.ptr, &mut result);
+            result
+        }
+    }
+
+    fn as_value(member: &Self) -> Value {
+        unsafe {
+            let mut ptr = std::ptr::null_mut();
+            ffi::vt_Value_from_GfMatrix3d(
+                *(member as *const DMat3 as *const ffi::gf_Matrix3d_t),
+                &mut ptr,
+            );
+            Value { ptr }
+        }
+    }
+}
+
+impl ValueMember for Mat4 {
+    fn get(value: &Value) -> Option<&Self> {
+        if Self::is_holding(value) {
+            unsafe {
+                let mut ptr = std::ptr::null();
+                ffi::vt_Value_Get_GfMatrix4f(value.ptr, &mut ptr);
+                Some(&*(ptr as *mut Mat4))
+            }
+        } else {
+            None
+        }
+    }
+
+    fn is_holding(value: &Value) -> bool {
+        unsafe {
+            let mut result = false;
+            ffi::vt_Value_IsHolding_GfMatrix4f(value.ptr, &mut result);
+            result
+        }
+    }
+
+    fn as_value(member: &Self) -> Value {
+        unsafe {
+            let mut ptr = std::ptr::null_mut();
+            ffi::vt_Value_from_GfMatrix4f(
+                *(member as *const Mat4 as *const ffi::gf_Matrix4f_t),
+                &mut ptr,
+            );
+            Value { ptr }
+        }
+    }
+}
+
+impl ValueMember for DMat4 {
+    fn get(value: &Value) -> Option<&Self> {
+        if Self::is_holding(value) {
+            unsafe {
+                let mut ptr = std::ptr::null();
+                ffi::vt_Value_Get_GfMatrix4d(value.ptr, &mut ptr);
+                Some(&*(ptr as *mut DMat4))
+            }
+        } else {
+            None
+        }
+    }
+
+    fn is_holding(value: &Value) -> bool {
+        unsafe {
+            let mut result = false;
+            ffi::vt_Value_IsHolding_GfMatrix4d(value.ptr, &mut result);
+            result
+        }
+    }
+
+    fn as_value(member: &Self) -> Value {
+        unsafe {
+            let mut ptr = std::ptr::null_mut();
+            ffi::vt_Value_from_GfMatrix4d(
+                *(member as *const DMat4 as *const ffi::gf_Matrix4d_t),
                 &mut ptr,
             );
             Value { ptr }
